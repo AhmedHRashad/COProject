@@ -1,0 +1,436 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct request {
+   char  data[50];
+   char  priority[20];
+}request;
+
+
+void swap(request*a ,request * b)
+{
+    request t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partitionInt (request arr[], int low, int high)
+{
+    int pivot = atoi(arr[high].priority);
+    int i = (low - 1);
+
+    for (int j = low; j <= high- 1; j++)
+    {
+
+        if (atoi(arr[j].priority) < pivot)
+        {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+
+void quickSortInt(request arr[], int low, int high)
+{
+    if (low < high)
+    {
+
+        int pi = partitionInt(arr, low, high);
+
+
+        quickSortInt(arr, low, pi - 1);
+        quickSortInt(arr, pi + 1, high);
+    }
+}
+int asci(char arr[]){
+    int asci=0;
+    for(int i=0;i<strlen(arr);i++){
+        asci+=arr[i];
+
+    }
+    return asci;
+}
+
+
+
+int partitionData (request arr[], int low, int high)
+{
+    char pivot[50];
+    strcpy(pivot,arr[high].data);
+    int i = (low - 1);
+
+    for (int j = low; j <= high- 1; j++)
+    {
+
+        if (asci(arr[j].data) < asci(pivot))
+        {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+
+void quickSortData(request arr[], int low, int high)
+{
+    if (low < high)
+    {
+
+        int pi = partitionData(arr, low, high);
+
+
+        quickSortData(arr, low, pi - 1);
+        quickSortData(arr, pi + 1, high);
+    }
+}
+
+void quickSortBoth(request arr[],int low,int high){
+    quickSortInt(arr,low,high);
+    int j = 0;
+    for(int i=0;i<=high;i++){
+        if(atoi(arr[i].priority)!=atoi(arr[i+1].priority)) {
+            quickSortData(arr, j, i);
+            j = i + 1;
+        }
+    }
+}
+int SearchPriority(request array[], int start_index, int end_index, int element){
+    if (end_index >= start_index){
+        int middle = start_index + (end_index - start_index )/2;
+        if (atoi(array[middle].priority) == element)
+            return middle;
+        if (atoi(array[middle].priority) > element)
+            return SearchPriority(array, start_index, middle-1, element);
+        return SearchPriority(array, middle+1, end_index, element);
+    }
+    return -1;
+}
+
+
+int SearchData(request array[], int start_index, int end_index, char element[50]){
+    if (end_index >= start_index){
+        int middle = start_index + (end_index - start_index )/2;
+        if (!strcmp(array[middle].data,element))
+            return middle;
+        if (asci(array[middle].data) > asci(element)) {
+            return SearchData(array, start_index, middle - 1, element);
+        }
+        return SearchData(array, middle+1, end_index, element);
+    }
+    return -1;
+}
+
+
+
+int SearchBoth(request array[], int start_index, int end_index, request element){
+    int flag=0;
+    if (end_index >= start_index){
+        int middle = start_index + (end_index - start_index )/2;
+        printf("%d\n",middle);
+        if (atoi(array[middle].priority) == atoi(element.priority)) {
+            flag = SearchData(array, middle, end_index, element.data);
+            if (flag == -1) {
+                SearchData(array, start_index, middle, element.data);
+            } else
+                return flag;
+        }
+        if (atoi(array[middle].priority) > atoi(element.priority)) {
+            return SearchBoth(array, start_index, middle - 1, element);
+        }return SearchBoth(array, middle+1, end_index,element);
+    }
+    return -1;
+}
+
+
+void Process(struct request l1[], struct request l2[], struct request l3[], struct request l4[], char temp_priority[], int l1_count, int l2_count, int l3_count, int l4_count)
+{
+    int temp_count=0;
+    struct request temp[80];
+    for (int i = 0; i < l1_count;i++)
+            {
+                if( strcmp(temp_priority, l1[i].priority) == 0)
+                {
+                    strcpy(temp[temp_count].data, l1[i].data);
+                    strcpy(temp[temp_count].priority, l1[i].priority);
+                    temp_count++;
+                }
+            }
+            for (int i2 = 0; i2 < l2_count;i2++)
+            {
+                if( strcmp(temp_priority, l1[i2].priority) == 0)
+                {
+                    strcpy(temp[temp_count].data, l2[i2].data);
+                    strcpy(temp[temp_count].priority, l2[i2].priority);
+                    temp_count++;
+                }
+            }
+            for (int i3 = 0; i3 < l3_count;i3++)
+            {
+                if( strcmp(temp_priority, l3[i3].priority) == 0)
+                {
+                    strcpy(temp[temp_count].data, l3[i3].data);
+                    strcpy(temp[temp_count].priority, l3[i3].priority);
+                    temp_count++;
+                }
+            }
+            for (int i4 = 0; i4 < l4_count;i4++)
+            {
+                if( strcmp(temp_priority, l4[i4].priority) == 0)
+                {
+                    strcpy(temp[temp_count].data, l4[i4].data);
+                    strcpy(temp[temp_count].priority, l4[i4].priority);
+                    temp_count++;
+                }
+            }
+
+            for ( int j=0; j< temp_count; j++ )
+            {
+                printf("%s - %s\n",temp[j].data, temp[j].priority);
+            }
+}
+
+int main()
+{
+    int choice1,choice2,choice3,l1_count =0, l2_count=0, l3_count=0, l4_count=0, temp_count;
+    struct request l1[20],l2[20],l3[20],l4[20],temp[80];
+    struct request search;
+    char search_data[50];
+    int search_priority;
+
+    printf("Enter 1 to add request \nEnter any number else to stop adding requests \nPlease enter your choice: ");
+        scanf("%d",&choice1);
+
+    while (choice1 == 1)
+    {
+        choice1 = 0;
+
+            if (l1_count < 20)
+            {
+                printf("please Enter the request data: ");
+                scanf("%s",l1[l1_count].data);
+                printf("please Enter the request priority\n1 for low\n2 for medium\n3 for high\n4 for critical\n");
+                scanf("%s",l1[l1_count].priority);
+                l1_count++;
+            }
+            else if (l2_count < 20)
+            {
+                printf("please Enter the request data: ");
+                scanf("%s",l2[l2_count].data);
+                printf("please Enter the request priority\n1 for low\n2 for medium\n3 for high\n4 for critical\n");
+                scanf("%s",l2[l2_count].priority);
+                l2_count++;
+            }
+            else if (l3_count < 20)
+            {
+                printf("please Enter the request data: ");
+                scanf("%s",l3[l3_count].data);
+                printf("please Enter the request priority\n1 for low\n2 for medium\n3 for high\n4 for critical\n");
+                scanf("%s",l3[l3_count].priority);
+                l3_count++;
+            }
+            else if (l4_count < 20)
+            {
+                printf("please Enter the request data: ");
+                scanf("%s",l4[l4_count].data);
+                printf("please Enter the request priority\n1 for low\n2 for medium\n3 for high\n4 for critical\n");
+                scanf("%s",l4[l4_count].priority);
+                l4_count++;
+            }
+            else
+            {
+                printf("lists is full");
+            }
+        printf("Enter 1 to add request \nEnter any number else to stop adding requests \nPlease enter your choice: ");
+        scanf("%d",&choice1);
+
+    }
+
+    while (1)
+    {
+
+        printf("\nEnter 1 to for binary search among lists \nEnter 2 to delete requests from lists \nEnter 3 to process requests with specific priority \nEnter 4 to delete all requests in the lists \nEnter anything else to exit \nPlease enter your choice: ");
+        scanf("%d",&choice2);
+
+
+        if (choice2 == 1)
+        {
+            printf("Enter 1 to for binary search on data \nEnter 2 to for binary search on priority \nEnter 3 for binary search on both \nEnter anything else to exit \nPlease enter your choice: ");
+            scanf("%d",&choice3);
+
+        temp_count = 0;
+        for (int i1 = 0; i1 < l1_count; i1++)
+    {
+        strcpy(temp[temp_count].data, l1[i1].data);
+        strcpy(temp[temp_count].priority, l1[i1].priority);
+        temp_count++;
+    }
+    for (int i2 = 0; i2 < l2_count; i2++)
+    {
+        strcpy(temp[temp_count].data, l2[i2].data);
+        strcpy(temp[temp_count].priority, l2[i2].priority);
+        temp_count++;
+    }
+    for (int i3 = 0; i3 < l3_count; i3++)
+    {
+        strcpy(temp[temp_count].data, l3[i3].data);
+        strcpy(temp[temp_count].priority, l3[i3].priority);
+        temp_count++;
+    }
+    for (int i4 = 0; i4 < l4_count; i4++)
+    {
+        strcpy(temp[temp_count].data, l4[i4].data);
+        strcpy(temp[temp_count].priority, l4[i4].priority);
+        temp_count++;
+    }
+
+
+
+
+        if (choice3 == 1)
+        {
+            printf("Please Enter The Request's Data that You want To Search for : \n");
+            scanf("%s",search_data);
+            quickSortData(temp,0,temp_count);
+            int result = SearchData(temp,0,temp_count,search_data);
+            if(result==-1)
+                printf("Request does not exist!!\n");
+            else
+                printf("The request is \n %s : %s\n",temp[result].data,temp[result].priority);
+        }
+
+
+        else if (choice3 == 2)
+        {
+            printf("Please Enter The Request's priority that You want To Search for : \n");
+            scanf("%d",&search_priority);
+            quickSortInt(temp,0,temp_count);
+            int result = SearchPriority(temp,0,temp_count,search_priority);
+            if(result==-1)
+                printf("Request does not exist!!\n");
+            else
+                printf("The request is \n %s : %s\n",temp[result].data,temp[result].priority);
+
+        }
+        else if (choice3 == 3)
+        {
+            printf("Please Enter The Request's Data that You want To Search for : \n");
+            scanf("%s",search.data);
+            printf("Please Enter The Request's priority that You want To Search for : \n");
+            scanf("%s",search.priority);
+            quickSortBoth(temp,0,temp_count);
+            int result = SearchBoth(temp,0,temp_count,search);
+            if(result==-1)
+                printf("Request does not exist!!\n");
+            else
+                printf("The request is \n %s : %s\n",temp[result].data,temp[result].priority);
+
+        }
+        else
+            break;
+
+        }
+
+        else if (choice2 == 2)
+        {
+            char temp_priority[20];
+            temp_count = 0;
+            printf("Please enter the requests priority that you want to delete:\n1 for low\n2 for medium\n3 for high\n4 for critical\n ");
+            scanf("%s", temp_priority);
+
+            for (int i1 = 0; i1 < l1_count; i1++)
+    {
+        strcpy(temp[temp_count].data, l1[i1].data);
+        strcpy(temp[temp_count].priority, l1[i1].priority);
+        temp_count++;
+    }
+    for (int i2 = 0; i2 < l2_count; i2++)
+    {
+        strcpy(temp[temp_count].data, l2[i2].data);
+        strcpy(temp[temp_count].priority, l2[i2].priority);
+        temp_count++;
+    }
+    for (int i3 = 0; i3 < l3_count; i3++)
+    {
+        strcpy(temp[temp_count].data, l3[i3].data);
+        strcpy(temp[temp_count].priority, l3[i3].priority);
+        temp_count++;
+    }
+    for (int i4 = 0; i4 < l4_count; i4++)
+    {
+        strcpy(temp[temp_count].data, l4[i4].data);
+        strcpy(temp[temp_count].priority, l4[i4].priority);
+        temp_count++;
+    }
+
+
+    for (int i = 0; i < temp_count;i++)
+    {
+        if( strcmp(temp_priority, temp[i].priority) == 0)
+        {
+
+            for (int j = i; j < temp_count; j++ )
+            {
+                temp[j] = temp[j+1];
+            }
+            if ( temp_count >= 0 && temp_count < 20 ){ l1_count--;}
+            else if ( temp_count >= 20 && temp_count < 40 ){ l2_count--;}
+            else if ( temp_count >= 40 && temp_count < 60 ){ l3_count--;}
+            else {l4_count--;}
+            temp_count--;
+        }
+    }
+    temp_count = 0;
+    for (int j1 = 0; j1 < l1_count; j1++)
+    {
+        strcpy(l1[j1].data, temp[temp_count].data);
+        strcpy(l1[j1].priority, temp[temp_count].priority);
+        temp_count++;
+    }
+    for (int j2 = 0; j2 < l2_count; j2++)
+    {
+        strcpy(l2[j2].data, temp[temp_count].data);
+        strcpy(l2[j2].priority, temp[temp_count].priority);
+        temp_count++;
+    }
+    for (int j3 = 0; j3 < l3_count; j3++)
+    {
+        strcpy(l3[j3].data, temp[temp_count].data);
+        strcpy(l3[j3].priority, temp[temp_count].priority);
+        temp_count++;
+    }
+    for (int j4 = 0; j4 < l4_count; j4++)
+    {
+        strcpy(l4[j4].data, temp[temp_count].data);
+        strcpy(l4[j4].priority, temp[temp_count].priority);
+        temp_count++;
+    }
+
+
+        }
+
+        else if (choice2 == 3)
+        {
+            char temp_priority[20];
+            printf("Please enter the requests priority that you want to print:\n1 for low\n2 for medium\n3 for high\n4 for critical\n");
+            scanf("%s", temp_priority);
+            Process(l1, l2, l3, l4,temp_priority, l1_count, l2_count, l3_count, l4_count);
+
+        }
+
+        else if (choice2 == 4)
+        {
+            l1_count =0, l2_count=0, l3_count=0, l4_count=0;
+        }
+        else
+            break;
+    }
+
+
+    return 0;
+}
