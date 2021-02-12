@@ -1,1 +1,776 @@
-#ٍstart of mips code
+.data 
+ 
+         request:     .space 80
+        # check5 .space
+         choice1:     .word
+         choice2:     .word
+         choice3:     .word
+         choice4:     .word
+         
+         l1_count:    .word 0
+         l2_count:    .word 0 
+         l3_count:    .word 0 
+         l4_count:    .word 0  
+         
+         temp_count:  .word
+         
+         firstList:   .align 2
+                      .space 160
+         secList:     .align 2
+                      .space 160
+         thirdList:   .align 2
+                      .space 160
+         fourthList:  .align 2
+                      .space 160
+                 
+         tempArr:     .align 2
+                      .space 640
+         
+         firstprompt: .asciiz"Enter 1 to add request \nEnter any number else to stop adding requests \nPlease enter your choice:"
+         secprompt:   .asciiz "please enter the request data:"
+         thirdprompt: .asciiz "please Enter the request priority\n1 for low\n2 for medium\n3 for high\n4 for critical\n"
+         processes:   .asciiz "\nEnter 1 to for binary search among lists \nEnter 2 to delete requests from lists \nEnter 3 to process requests with specific priority \nEnter 4 to delete all requests in the lists \nEnter anything else to exit \nPlease enter your choice: "
+         binarySearchChoices:   .asciiz "Enter 1 to for binary search on data \nEnter 2 to for binary search on priority \nEnter 3 for binary search on both \nEnter anything else to exit \nPlease enter your choice: "
+         
+            
+
+.text 
+      
+
+    main:
+    
+    
+     #load l1_count from the RAM and save it in register $t4
+     #Intialization for the 1l_cont = 0
+   lw $t4, l1_count
+   
+    #load l3_count from the RAM and save it in register $t5
+   lw $t5, l2_count
+   
+    #load l1_count from the RAM and save it in register $t6
+   lw $t6, l3_count
+   
+    #load l1_count from the RAM and save it in register $t7
+   lw $t7, l4_count
+     
+   
+       while:
+         #check if l4_count > 40 then exit "the list is full"
+         addi $t2, $zero, 40
+         #if($t7 > $t2) where $t2 = 40
+         bge $t5, $t2 ,exit
+          
+            #printing amessage to user
+        li $v0, 4
+        la $a0, firstprompt
+        syscall
+        
+        #Get the choice from the user
+        li $v0, 5
+        syscall
+        #move the input data from $v0 to $ s0
+        move $s0, $v0
+        sw $s0, choice1
+        
+        #if(choice1 != 1)
+        addi $t0, $zero, 1
+        bne $s0, $t0, else
+        
+        #call insert function
+        jal insertRequset
+        j while
+        
+        else:
+        # break from while loop
+           add $t5, $zero, 40
+           j while
+       
+        
+       exit:
+       
+                   
+   #end of main
+    li $v0, 10
+    syscall
+
+
+
+#insert request and store it in the array
+   insertRequset:
+   
+  
+   #if(l1_count < 40)
+   slti  $s1, $t4, 40
+     beq $s1, $zero, Else
+   
+   #Ask the user to input the data
+   li $v0 4
+   la $a0, secprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, firstList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, firstList($zero)
+  sll $t3, $t4, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+ 
+  
+   #increment the index $t2
+  addi $t4, $t4,1
+  
+  
+  
+  #Ask the user to input the priority
+  
+   li $v0 4
+   la $a0, thirdprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, firstList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  
+  
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, firstList($zero)
+  sll $t3, $t4, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+  #increment the index $t2
+  addi $t4, $t4,1
+  
+  #to return to man once again
+   addi $t1, $zero, 0  
+   beq $t1, $zero, exit_1    
+ 
+      
+  Else:
+      
+   #if(l2_count < 40) where 2l_count = $t5
+    slti  $s1, $t5, 40
+     beq $s1, $zero, Else1
+   
+   #Ask the user to input the data
+   li $v0 4
+   la $a0, secprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, secList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, secList($zero)
+  sll $t3, $t5, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+ 
+  
+   #increment the index $t2
+  addi $t5, $t5,1
+  
+  
+  #Ask the user to input the priority
+  
+   li $v0 4
+   la $a0, thirdprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, secList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  
+  
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, secList($zero)
+  sll $t3, $t5, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+  #increment the index $t2
+  addi $t5, $t5,1
+  
+  #to return to the main function   
+  beq $t1, $zero, exit_2
+      
+  Else1:
+        
+   #if(l3_count < 40) where l3_count = $t6
+     slti  $s1, $t6, 40
+     beq $s1, $zero, Else2
+   
+   #Ask the user to input the data
+   li $v0 4
+   la $a0, secprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, thirdList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, thirdList($zero)
+  sll $t3, $t6, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+ 
+  
+   #increment the index $t2
+  addi $t6, $t6, 1
+  
+  
+  #Ask the user to input the priority
+  
+   li $v0 4
+   la $a0, thirdprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, thirdList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  
+  
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, thirdList($zero)
+  sll $t3, $t6, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+  #increment the index $t2
+  addi $t6, $t6, 1
+  
+      
+#to return to the main function   
+  beq $t1, $zero, exit_3
+  
+Else2:
+      
+   #if(l4_count < 40) where l4_count = $t7
+     slti  $s1, $t7, 40
+     beq $s1, $zero, Else3
+   
+   #Ask the user to input the data
+   li $v0 4
+   la $a0, secprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, fourthList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, fourthList($zero)
+  sll $t3, $t7, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+ 
+  
+   #increment the index $t2
+  addi $t7, $t7,1
+  
+  
+  #Ask the user to input the priority
+  
+   li $v0 4
+   la $a0, thirdprompt
+   syscall
+   
+   #Get the input from the user
+   li $v0, 8
+   la $a0, fourthList
+   li $a1, 160
+   syscall
+   #Store the input data in the first list
+   move $s2, $v0
+   
+  
+  
+  #load the address of firstList[0] in $a1 BASE ADDRESS
+  
+  la $a1, fourthList($zero)
+  sll $t3, $t7, 2        #multiply the array index by 8 where $t2 = index l1_count
+  add $t3, $t3, $a1
+  sw $s2, 0($t3)
+  
+  #increment the index $t2
+  addi $t7, $t7,1
+  
+  #to return to the main function   
+  beq $t1, $zero, exit_4
+      
+  Else3:
+  
+  exit_1:
+  exit_2:
+  exit_3:
+  exit_4:     
+      
+      
+   
+
+     addi $sp,$sp,-4                   #store return address
+     addi $s5,$ra,0
+
+
+
+
+    sw $s5,0($sp)
+
+    lw $s5,0($sp)                #load return address
+        add $sp,$sp,4
+        addi $ra,$s5,0
+        jr $ra
+        partitionData:
+	addi $sp, $sp, -16
+	sw $a0, 0($sp)			#address of array
+	sw $a1, 4($sp)			#low
+	sw $a2, 8($sp)			#high
+	sw $ra, 12($sp)			#Return address
+	mul $t0, $a1, 4			#$t0 = 4*low
+	add $t1, $t0, $a0		#$t1 = address of array plus $t0
+	move $s0, $a1			#left = low
+	move $s1, $a2			#right = high
+	lw $s3, 0($t1)			#pivot =array[low]
+	lw $t3, 0($sp)			#$t3 = address of array
+	
+	while1:
+		bge $s0, $s1, endwhile
+		while3:
+			mul $t2, $s1, 4			#$t2= right *4
+			add $s6, $t2, $t3		#$t3= $t2+array address
+			lw $s4, 0($s6)			#$s4 = array[right]
+			ble $s4,$s3, endwhile1		#end while1 if array[right]<= pivot
+			subi $s1,$s1,1			#right = right -1
+			j while1
+		endwhile1:	
+		
+		while2:
+			mul $t4, $s0, 4			#$t4 = left*4
+			add $s7, $t4, $t3		#$t5= $t4+array address
+			lw $s5, 0($s7)			#$s5=array[left]
+
+			bge $s0, $s1, endwhile2		#branch if left>=right to endwhile2
+			bgt $s5, $s3, endwhile2		#branch if aray[left]>pivot to endwhile2
+			addi $s0,$s0,1			#left = left+1
+			j while2
+		endwhile2:
+		
+		if:
+			bge $s0, $s1, end_if		#if left>=right branch to end_if
+			move $a0, $t3			#move $t3 to $a0
+			move $a1, $s7			#move array[left] into $a1
+			move $a2, $s6			#move array[right] into $a2
+			#jal swap			#jump and link swap
+			
+			
+		end_if:
+		
+		j while3
+		
+	endwhile:	
+	
+		lw $s5, 0($s7)				#set $s5 to array[left]
+		lw $s4, 0($s6)				#set $s4 to array[right]
+		sw $s4 0($t1)				#array[low]=array[right]
+		sw $s3, 0($s6)				#array[right]=pivot
+		
+		
+		move $v0, $s1				#set $v0 to right
+		
+	lw $ra 12($sp)					#restore $ra
+	addi $sp, $sp,16				#restore stack
+	jr $ra			
+				#return to $ra
+
+
+
+ascii:
+	li $t0, 0 		# initialize the ascii sum to zero
+	loop:
+	lbu $t1, request($a0) 	# load the next character into t1
+	beqz $t1, exit 		# check if it's a null character
+	addi $a0, $a0, 1 	# increment the string pointer
+	add $t0, $t0, $t1 	# increment the ascii sum
+	j loop  
+
+
+	exit1:	
+		addi $v1,$t0,0                  #add the sum in $v1	
+		jr $ra				#return to $ra 
+			
+
+
+
+
+quicksortData:				
+
+	addi $sp, $sp, -16		# Create stack for 4 bytes
+
+	sw $a0, 0($sp)			#store address in stack
+	sw $a1, 4($sp)			#store low in stack	
+	sw $a2, 8($sp)			#store high in stack
+	sw $ra, 12($sp)			#store return address in stack
+
+	move $t0, $a2			#saving high in t0
+	
+	checkCond:
+		slt $t1, $a1, $t0		# t1=1 if low < high, else 0
+		beq $t1, $zero, end_check		# if low >= high, endcheck
+
+		jal partitionData			# call partitionData 
+		move $s0, $v0			# pivot, s0= v0
+
+		lw $a1, 4($sp)			#a1 = low
+		addi $a2, $s0, -1		#a2 = pi -1
+		jal quicksortData			#call quicksortData
+
+		addi $a1, $s0, 1		#a1 = pi + 1
+		lw $a2, 8($sp)			#a2 = high
+		jal quicksortData			#call quicksortData
+		
+	end_check:
+	lw $a0, 0($sp)			#restore a0
+ 	lw $a1, 4($sp)			#restore a1
+ 	lw $a2, 8($sp)			#restore $a2
+	lw $ra 12($sp)			#load return adress into ra
+	addi $sp, $sp, 16		#restore stack
+	jr $ra				#return to $ra
+	process:    #assume that parameters in $s0 to s3 and $t0 to t4
+
+
+        la   $t5, request      # $t5 is the base address of the array
+    addi $t6,$zero, 0    #temp = zero
+Main_loop:
+    bge $t6,$t1,exit_copy #exit loop if I<li_count
+strcmp:
+add $t7,$zero,$zero
+add $t8,$zero,$t0   #load temp_priority to t8
+add $t9,$zero,$     #load 
+loop2:
+lb $t3($t7)  #load a byte from each string
+lb $t4($t8)
+#beqz $t3,checkt5 #str1 end
+beqz $t4,missmatch
+slt $t5,$t3,$t4  #compare two bytes
+bnez $t5,missmatch
+addi $t1,$t1,1  #t1 points to the next byte of str1
+addi $t2,$t2,1
+missmatch: 
+addi $v0,$zero,1
+j endfunction
+j loop
+
+exit_copy:
+la $a0, array			#load the address of array into $a0
+	addi $a1, $zero, 0		#set $a1 to low
+	li $a2, 10			#set $a2 to high
+	jal quicksort			#jump and link quicksort
+	
+	li $v0, 10
+	syscall
+
+swap:
+	addi $sp, $sp, -12		#Make stack of 3 bytes
+	sw $a0, 0($sp)			#Store $a0
+	sw $a1, 4($sp)			#Store $a1
+	sw $a2, 8($sp)			#Store $a2
+	
+	lw $t6, 0($a1)			#$t6=array[left]
+	lw $t7, 0($a2)			#$t7=array[right]
+	sw $t6, 0($a2)			#array[right]=$t6
+	sw $t7, 0($a1)			#array[left]=$t7
+	
+	
+	
+	addi $sp,$sp,12			#restore stack
+	jr $ra				#return to $ra
+	
+
+partition:
+	addi $sp, $sp, -16
+	sw $a0, 0($sp)			#address of array
+	sw $a1, 4($sp)			#low
+	sw $a2, 8($sp)			#high
+	sw $ra, 12($sp)			#Return address
+	mul $t0, $a1, 4			#$t0 = 4*low
+	add $t1, $t0, $a0		#$t1 = address of array plus $t0
+	move $s0, $a1			#left = low
+	move $s1, $a2			#right = high
+	lw $s3, 0($t1)			#pivot =array[low]
+	lw $t3, 0($sp)			#$t3 = address of array
+	
+	while5:
+		bge $s0, $s1, endwhile5
+		while6:
+			mul $t2, $s1, 4			#$t2= right *4
+			add $s6, $t2, $t3		#$t3= $t2+array address
+			lw $s4, 0($s6)			#$s4 = array[right]
+			ble $s4,$s3, endwhile6  	#end while1 if array[right]<= pivot
+			subi $s1,$s1,1			#right = right -1
+			j while6
+		endwhile6:
+		
+		while7:
+			mul $t4, $s0, 4			#$t4 = left*4
+			add $s7, $t4, $t3		#$t5= $t4+array address
+			lw $s5, 0($s7)			#$s5=array[left]
+			bge $s0, $s1, endwhile7	 #branch if left>=right to endwhile2
+			bgt $s5, $s3, endwhile7 	#branch if aray[left]>pivot to endwhile2
+			addi $s0,$s0,1			#left = left+1
+			j while2
+		endwhile7:
+		
+		if2:
+			bge $s0, $s1, end_if		#if left>=right branch to end_if
+			move $a0, $t3			#move $t3 to $a0
+			move $a1, $s7			#move array[left] into $a1
+			move $a2, $s6			#move array[right] into $a2
+			jal swap			#jump and link swap
+			
+			
+		end_if2:
+		
+		j while5
+		
+	endwhile5:	
+	
+		lw $s5, 0($s7)				#set $s5 to array[left]
+		lw $s4, 0($s6)				#set $s4 to array[right]
+		sw $s4 0($t1)				#array[low]=array[right]
+		sw $s3, 0($s6)				#array[right]=pivot
+		
+		
+		move $v0, $s1				#set $v0 to right
+		
+	lw $ra 12($sp)					#restore $ra
+	addi $sp, $sp,16				#restore stack
+	jr $ra						#return to $ra
+	
+quicksort:				
+
+	addi $sp, $sp, -16		# Create stack for 4 bytes
+
+	sw $a0, 0($sp)			#store address in stack
+	sw $a1, 4($sp)			#store low in stack	
+	sw $a2, 8($sp)			#store high in stack
+	sw $ra, 12($sp)			#store return address in stack
+
+	move $t0, $a2			#saving high in t0
+	
+	checkCond2:
+		slt $t1, $a1, $t0		# t1=1 if low < high, else 0
+		beq $t1, $zero, end_check		# if low >= high, endcheck
+
+		jal partition			# call partition 
+		move $s0, $v0			# pivot, s0= v0
+
+		lw $a1, 4($sp)			#a1 = low
+		addi $a2, $s0, -1		#a2 = pi -1
+		jal quicksort			#call quicksort
+
+		addi $a1, $s0, 1		#a1 = pi + 1
+		lw $a2, 8($sp)			#a2 = high
+		jal quicksort			#call quicksort
+		
+	end_check2:
+	lw $a0, 0($sp)			#restore a0
+ 	lw $a1, 4($sp)			#restore a1
+ 	lw $a2, 8($sp)			#restore $a2
+	lw $ra 12($sp)			#load return adress into ra
+	addi $sp, $sp, 16		#restore stack
+	jr $ra
+
+
+
+
+
+
+
+
+
+
+
+
+#MOHSEN MAMDOUH code
+
+# load $s0: base address
+# load $s1: array size
+# $s2: the search element
+# return index at $v0
+
+.data
+myArray:   .word 1, 4, 5, 7, 9, 12, 15, 17, 20, 21, 30
+arraySize: .word 11
+
+.text
+
+.globl main
+
+main:
+    # perform the first test
+    addi $a1, $zero, 15
+    jal  binarySearch
+    add  $s3, $v0, $zero
+
+exit:
+    li $v0, 10
+    syscall
+
+binarySearch:
+    la   $s0, myArray            
+    add  $a0, $zero, $zero       
+    lw   $s1, arraySize         
+    addi $s1, $s1,  -1           
+    add  $s2, $zero, $a1         
+
+    j loop                       
+
+loop:
+    add $t0, $s1, $a0          
+    sra $t1, $t0, 1            
+    add $t1, $t1, $s0          
+    beq $t1, $s2, return       
+    slt $t2, $t1, $s2          
+    beq $t2, $zero, leftHalf   
+    j   rightHalf             
+
+leftHalf:
+    add $s1, $t1, -1             
+    j do_loop                    
+
+rightHalf:
+    addi $t1, $t1,   1
+    add  $a0, $zero, $t1         
+    j    do_loop                 
+return:
+    add $ra, $zero, $t1
+    jr  $ra
+
+
+main:
+    # perform the first test
+    addi $a1, $zero, 15
+    jal  binarySearch
+    add  $s3, $v0, $zero
+
+exit:
+    li $v0, 10
+    syscall
+
+binarySearch:
+    la   $s0, myArray            
+    add  $a0, $zero, $zero       
+    lw   $s1, arraySize         
+    addi $s1, $s1,  -1           
+    add  $s2, $zero, $a1         
+
+    j loop                       
+
+loop:
+    add $t0, $s1, $a0          
+    sra $t1, $t0, 1            
+    add $t1, $t1, $s0          
+    beq $t1, $s2, return       
+    slt $t2, $t1, $s2          
+    beq $t2, $zero, leftHalf   
+    j   rightHalf             
+
+leftHalf:
+    add $s1, $t1, -1             
+    j do_loop                    
+
+rightHalf:
+    addi $t1, $t1,   1
+    add  $a0, $zero, $t1         
+    j    do_loop                 
+return:
+    add $ra, $zero, $t1
+    jr  $ra
+
+
+main:
+    # perform the first test
+    addi $a1, $zero, 15
+    jal  binarySearch
+    add  $s3, $v0, $zero
+
+exit:
+    li $v0, 10
+    syscall
+
+binarySearch:
+    la   $s0, myArray            
+    add  $a0, $zero, $zero       
+    lw   $s1, arraySize         
+    addi $s1, $s1,  -1           
+    add  $s2, $zero, $a1         
+
+    j loop                       
+
+loop:
+    add $t0, $s1, $a0          
+    sra $t1, $t0, 1            
+    add $t1, $t1, $s0          
+    beq $t1, $s2, return       
+    slt $t2, $t1, $s2          
+    beq $t2, $zero, leftHalf   
+    j   rightHalf             
+
+leftHalf:
+    add $s1, $t1, -1             
+    j do_loop                    
+
+rightHalf:
+    addi $t1, $t1,   1
+    add  $a0, $zero, $t1         
+    j    do_loop                 
+return:
+    add $ra, $zero, $t1
+    jr  $ra
